@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -42,16 +39,21 @@ public class Img2TxtController {
         return "/imgUpload";
     }
 
-    @RequestMapping(value = "/transfer",method = RequestMethod.POST)
+    @RequestMapping(value = "/img2img",method = RequestMethod.GET)
+    public String toImagePage(){
+        return "/img2img";
+    }
+
+    @RequestMapping(value = "/transfer/{type}",method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<InputStreamResource> imt2txt(@RequestParam("file") MultipartFile file){
+    public ResponseEntity<InputStreamResource> imt2txt(@RequestParam("file") MultipartFile file,@PathVariable String type){
         try {
             String originalFilename = file.getOriginalFilename();
             HttpHeaders headers = new HttpHeaders();
 
             // 支持jpg、png
             if(originalFilename.toLowerCase().endsWith("jpg")||originalFilename.toLowerCase().endsWith("png")){
-                File outFile = img2TxtService.save(file.getBytes(), originalFilename);
+                File outFile = img2TxtService.save(file.getBytes(), originalFilename,type);
                 headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
                 headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", outFile.getName()));
                 headers.add("Pragma", "no-cache");

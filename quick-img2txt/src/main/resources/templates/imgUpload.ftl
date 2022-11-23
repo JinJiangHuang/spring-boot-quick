@@ -21,7 +21,7 @@
                 </h4>
             </div>
             <div class="panel-body">
-                <form method="POST" enctype="multipart/form-data" action="/transfer">
+                <form method="POST" enctype="multipart/form-data" action="/transfer/1">
                     <div>
                         <p>
                             选择文件<input type="file" name="file"/>

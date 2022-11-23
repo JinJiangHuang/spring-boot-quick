@@ -21,7 +21,7 @@ import java.io.IOException;
 public class Img2TxtService {
 
     public static String toChar = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:, ^`'. ";
-    public static int width = 500, height = 500; // 大小自己可设置
+    public static int width = 150, height = 150; // 大小自己可设置
 
 	private static String FILE_PATH;
 
@@ -50,14 +50,17 @@ public class Img2TxtService {
 //        img2txt(file);
 //    }
 
-    public File save(byte[] bytes,String name) throws IOException {
+    public File save(byte[] bytes,String name,String type) throws IOException {
         File newFile = new File(FILE_PATH + File.separator + name);
         if(!newFile.exists()){
             newFile.createNewFile();
         }
         IOUtils.write(bytes,new FileOutputStream(newFile));
-        // return img2txt(newFile);
-        return img2img(newFile);
+        if ("1".equals(type)){
+            return img2txt(newFile);
+        }else{
+            return img2img(newFile);
+        }
     }
 
     private File img2txt(File file) throws IOException {
@@ -84,16 +87,16 @@ public class Img2TxtService {
         BufferedImage scaled = getScaledImg(image);
         char[][] array = getImageMatrix(scaled);
         StringBuffer sb = new StringBuffer();
-        String[] strs=new String[array.length];
+        String[] imgStr=new String[array.length];
         for (int i=0;i<array.length;i++) {
             char[] cs =array[i];
             for (char c : cs) {
                 sb.append(c);
             }
-            strs[i]=sb.toString();
+            imgStr[i]=sb.toString();
             sb = new StringBuffer();
         }
-        BufferedImage images = createImage(strs,image);
+        BufferedImage images = createImage(imgStr,image);
         String outName = file.getAbsolutePath()+".jpg";
         File outFile = new File(outName);
         // 创建图片输出流对象，基于文件对象
