@@ -90,11 +90,10 @@ public class Img2TxtService {
             for (char c : cs) {
                 sb.append(c);
             }
-            //sb.append("\r\n");
             strs[i]=sb.toString();
             sb = new StringBuffer();
         }
-        BufferedImage images = createImage(strs);
+        BufferedImage images = createImage(strs,image);
         String outName = file.getAbsolutePath()+".jpg";
         File outFile = new File(outName);
         // 创建图片输出流对象，基于文件对象
@@ -109,7 +108,7 @@ public class Img2TxtService {
 
     private static char[][] getImageMatrix(BufferedImage img) {
         int w = img.getWidth(), h = img.getHeight();
-        char[][] rst = new char[w][h];
+        char[][] rst = new char[h][w];
         for (int i = 0; i < w; i++)
             for (int j = 0; j < h; j++) {
                 int rgb = img.getRGB(i, j);
@@ -123,21 +122,32 @@ public class Img2TxtService {
                 int len = toChar.length();
                 int base = 256 / len + 1;
                 int charIdx = gray / base;
-                rst[j][i] = toChar.charAt(charIdx); // 注意i和j的处理顺序，如果是rst[j][i],图像是逆时针90度打印的，仔细体会下getRGB(i，j)这
+                // 注意i和j的处理顺序，如果是rst[i][j],图像是逆时针90度打印的，仔细体会下getRGB(i，j)这
+                rst[j][i] = toChar.charAt(charIdx);
             }
         return rst;
     }
 
     private static BufferedImage getScaledImg(BufferedImage image) {
-        BufferedImage rst = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-        rst.getGraphics().drawImage(image, 0, 0, width, height, null);
+        int w=image.getWidth();
+        int h=image.getHeight();
+        if (w<width||h<height){
+            w=width;
+            h=height;
+        }
+        BufferedImage rst = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+        rst.getGraphics().drawImage(image, 0, 0, w, h, null);
         return rst;
     }
 
-    public static BufferedImage createImage(String[] strs) {
+    public static BufferedImage createImage(String[] strs,BufferedImage img) {
         // 设置背景宽高
-        int width2 = width;
-        int height2 = height;
+        int width2 = img.getWidth();
+        int height2 = img.getHeight();
+        if (width2<width||height2<height){
+            width2=width;
+            height2=height;
+        }
         BufferedImage image = new BufferedImage(width2, height2, BufferedImage.TYPE_3BYTE_BGR);
         // 获取图形上下文对象
         Graphics graphics = image.getGraphics();
