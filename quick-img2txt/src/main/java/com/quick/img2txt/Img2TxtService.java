@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +21,7 @@ import java.io.IOException;
 public class Img2TxtService {
 
     public static String toChar = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:, ^`'. ";
-    public static int width = 150, height = 150; // 大小自己可设置
+    public static int width = 500, height = 500; // 大小自己可设置
 
 	private static String FILE_PATH;
 
@@ -54,7 +56,8 @@ public class Img2TxtService {
             newFile.createNewFile();
         }
         IOUtils.write(bytes,new FileOutputStream(newFile));
-        return img2txt(newFile);
+        // return img2txt(newFile);
+        return img2img(newFile);
     }
 
     private File img2txt(File file) throws IOException {
@@ -73,6 +76,33 @@ public class Img2TxtService {
         String outName = file.getAbsolutePath() + ".txt";
         File outFile = new File(outName);
         IOUtils.write(sb.toString(), new FileOutputStream(outFile));
+        return outFile;
+    }
+
+    private File img2img(File file) throws IOException {
+        BufferedImage image = ImageIO.read(file);
+        BufferedImage scaled = getScaledImg(image);
+        char[][] array = getImageMatrix(scaled);
+        StringBuffer sb = new StringBuffer();
+        String[] strs=new String[array.length];
+        for (int i=0;i<array.length;i++) {
+            char[] cs =array[i];
+            for (char c : cs) {
+                sb.append(c);
+            }
+            //sb.append("\r\n");
+            strs[i]=sb.toString();
+            sb = new StringBuffer();
+        }
+        BufferedImage images = createImage(strs);
+        String outName = file.getAbsolutePath()+".jpg";
+        File outFile = new File(outName);
+        // 创建图片输出流对象，基于文件对象
+        ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(outFile);
+        // 写入
+        ImageIO.write(images,"jpg",imageOutputStream);
+        // 关闭流
+        imageOutputStream.close();
         return outFile;
     }
 
@@ -102,5 +132,27 @@ public class Img2TxtService {
         BufferedImage rst = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         rst.getGraphics().drawImage(image, 0, 0, width, height, null);
         return rst;
+    }
+
+    public static BufferedImage createImage(String[] strs) {
+        // 设置背景宽高
+        int width2 = width;
+        int height2 = height;
+        BufferedImage image = new BufferedImage(width2, height2, BufferedImage.TYPE_3BYTE_BGR);
+        // 获取图形上下文对象
+        Graphics graphics = image.getGraphics();
+        // 填充
+        graphics.fillRect(0, 0, width2, height2);
+        // 设定字体大小及样式
+        graphics.setFont(new Font("宋体", Font.BOLD,1));
+        // 字体颜色
+        graphics.setColor(Color.BLACK);
+        for (int i = 0; i < strs.length; i=i+2) {
+            // 描绘字符串
+            graphics.drawString(strs[i], 0,   i+1 );
+            graphics.drawString("", 0,   i+2 );
+        }
+        graphics.dispose();
+        return image;
     }
 }
