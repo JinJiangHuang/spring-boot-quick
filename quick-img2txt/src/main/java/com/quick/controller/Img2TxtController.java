@@ -52,7 +52,7 @@ public class Img2TxtController {
             HttpHeaders headers = new HttpHeaders();
 
             // 支持jpg、png
-            if(originalFilename.toLowerCase().endsWith("jpg")||originalFilename.toLowerCase().endsWith("png")){
+            if(originalFilename.toLowerCase().endsWith("jpg")||originalFilename.toLowerCase().endsWith("png")||originalFilename.toLowerCase().endsWith("jpeg")){
                 File outFile = img2TxtService.save(file.getBytes(), originalFilename,type);
                 System.out.println("Path="+outFile.toURI().getPath());
                 headers.add("Cache-Control", "no-cache, no-store, must-revalidate");

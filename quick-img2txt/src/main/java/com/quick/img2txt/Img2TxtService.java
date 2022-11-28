@@ -152,6 +152,7 @@ public class Img2TxtService {
             height2=height;
         }
         BufferedImage image = new BufferedImage(width2, height2, BufferedImage.TYPE_3BYTE_BGR);
+        //BufferedImage image = img;
         // 获取图形上下文对象
         Graphics graphics = image.getGraphics();
         // 填充
@@ -159,11 +160,16 @@ public class Img2TxtService {
         // 设定字体大小及样式
         graphics.setFont(new Font("宋体", Font.BOLD,1));
         // 字体颜色
-        graphics.setColor(Color.BLACK);
-        for (int i = 0; i < strs.length; i=i+2) {
+        //graphics.setColor(new Color(227, 184, 171));
+        graphics.setColor(Color.GRAY);
+        /*for (int i = 0; i < strs.length; i=i+2) {
             // 描绘字符串
             graphics.drawString(strs[i], 0,   i+1 );
             graphics.drawString("", 0,   i+2 );
+        }*/
+        for (int i = 0; i < strs.length; i=i+1) {
+            // 描绘字符串
+            graphics.drawString(strs[i], 0,   i+1 );
         }
         graphics.dispose();
         return image;
