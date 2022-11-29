@@ -21,7 +21,7 @@ import java.io.IOException;
 public class Img2TxtService {
 
     public static String toChar = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:, ^`'. ";
-    public static int width = 150, height = 150; // 大小自己可设置
+    public static int width = 500, height = 500; // 大小自己可设置
 
 	private static String FILE_PATH;
 
@@ -59,7 +59,7 @@ public class Img2TxtService {
         if ("1".equals(type)){
             return img2txt(newFile);
         }else{
-            return img2img(newFile);
+            return  img2img(newFile);
         }
     }
 
@@ -83,8 +83,8 @@ public class Img2TxtService {
     }
 
     private File img2img(File file) throws IOException {
-        BufferedImage image = ImageIO.read(file);
-        BufferedImage scaled = getScaledImg(image);
+        BufferedImage sImage = ImageIO.read(file);
+        BufferedImage scaled = getScaledImg(sImage);
         char[][] array = getImageMatrix(scaled);
         StringBuffer sb = new StringBuffer();
         String[] imgStr=new String[array.length];
@@ -96,13 +96,14 @@ public class Img2TxtService {
             imgStr[i]=sb.toString();
             sb = new StringBuffer();
         }
-        BufferedImage images = createImage(imgStr,image);
+        BufferedImage dImage = createImage(imgStr, sImage);
+        setImgColor(sImage, dImage);
         String outName = file.getAbsolutePath()+".jpg";
         File outFile = new File(outName);
         // 创建图片输出流对象，基于文件对象
         ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(outFile);
         // 写入
-        ImageIO.write(images,"jpg",imageOutputStream);
+        ImageIO.write(dImage,"jpg",imageOutputStream);
         // 关闭流
         imageOutputStream.close();
         return outFile;
@@ -131,6 +132,25 @@ public class Img2TxtService {
         return rst;
     }
 
+    public static void setImgColor(BufferedImage sImg,BufferedImage dImg) {
+        int w = sImg.getWidth();
+        int h = sImg.getHeight();
+        if (w<width||h<height){
+            w=width;
+            h=height;
+        }
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                int r = sImg.getRGB(x, y);
+                int red = (r >> 16) & 0x0ff;
+                int green = (r >> 8) & 0x0ff;
+                int blue = r & 0x0ff;
+                if ((red>180&&green>150&&blue>125)||(x%2==0&&y%2==0)||(x%3==0&&y%3==0)||(red%4==0||green%3==0&&blue%5==0)){
+                    dImg.setRGB(x, y, r);
+                }
+            }
+        }
+    }
     private static BufferedImage getScaledImg(BufferedImage image) {
         int w=image.getWidth();
         int h=image.getHeight();
@@ -154,7 +174,8 @@ public class Img2TxtService {
         BufferedImage image = new BufferedImage(width2, height2, BufferedImage.TYPE_3BYTE_BGR);
         //BufferedImage image = img;
         // 获取图形上下文对象
-        Graphics graphics = image.getGraphics();
+        Graphics g = image.getGraphics();
+        Graphics2D graphics = (Graphics2D) g;
         // 填充
         graphics.fillRect(0, 0, width2, height2);
         // 设定字体大小及样式
