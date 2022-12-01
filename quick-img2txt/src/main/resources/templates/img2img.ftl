@@ -10,7 +10,9 @@
     <link href="https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery.form/4.3.0/jquery.form.min.js"></script>
+
 </head>
 <body>
 <div class="container">
@@ -22,20 +24,18 @@
                 </h4>
             </div>
             <div class="panel-body">
-                <form method="POST" enctype="multipart/form-data" action="/transfer/2">
+                <form method="POST" enctype="multipart/form-data" action="/img2img/2" id="fileForm" name="form">
                     <div>
                         <p>
                             选择文件<input id="chooseImage" type="file" name="file"/>
                         </p>
                         <p>
-                            <input type="submit" value="上传"/>
+                            <input type="button" id="subbut" value="上传"/>
                         </p>
-                        <p>
-                            上传图片：<img id="cropedBigImg" value='custom' data-address='' width="300px" height="300px"/>
-                        </p>
-                        <p>
-                            转换后：<img src="https://ooo.0o0.ooo/2017/06/11/593c2a4b4980f.jpg" class="img-responsive"/>
-                        </p>
+                        <div>
+                            上传图片：<img id="cropedBigImg" value='custom' data-address='' width="300px" height="300px" class="img-responsive"/>
+                            转换后：<img id="deImg" width="300px" height="300px" class="img-responsive"/>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -53,6 +53,22 @@
         }
         var src = window.URL.createObjectURL(this.files[0]); //转成可以在本地预览的格式
         $('#cropedBigImg').attr('src',src);
+    });
+    $("#subbut").on("click",function(){
+        $('#fileForm').ajaxSubmit({
+            success : function(data) {
+                var src='/downloadFile?fileName='+data.data;
+                console.log("src:"+src);
+                $('#deImg').attr('src',src);
+            },
+            beforeSend: function(){
+                // 上传前
+            },
+            error : function(data) {
+                //   失败后代码
+            }
+        })
+
     });
 </script>
 </body>

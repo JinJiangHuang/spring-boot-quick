@@ -1,6 +1,7 @@
 package com.quick.controller;
 
 import com.quick.img2txt.Img2TxtService;
+import com.quick.util.DataReturn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.InputStreamResource;
@@ -83,5 +84,23 @@ public class Img2TxtController {
             return new ResponseEntity("暂不支持的文件格式",HttpStatus.BAD_REQUEST);
         }
 //        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+
+    @RequestMapping(value = "/img2img/{type}",method = RequestMethod.POST)
+    @ResponseBody
+    public DataReturn imt2img(@RequestParam("file") MultipartFile file, @PathVariable String type){
+        try {
+            String originalFilename = file.getOriginalFilename();
+            // 支持jpg、png
+            if(originalFilename.toLowerCase().endsWith("jpg")||originalFilename.toLowerCase().endsWith("png")||originalFilename.toLowerCase().endsWith("jpeg")){
+                File outFile = img2TxtService.save(file.getBytes(), originalFilename,type);
+                return DataReturn.success("ok", outFile.getName());
+            }else{
+                return DataReturn.error("不支持的格式");
+            }
+        } catch (IOException e) {
+            logger.error(e);
+            return DataReturn.error("不支持的格式");
+        }
     }
 }
