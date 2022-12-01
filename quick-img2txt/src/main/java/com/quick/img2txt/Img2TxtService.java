@@ -22,22 +22,19 @@ public class Img2TxtService {
 
     public static String toChar = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:, ^`'. ";
     public  static  final  String PEOPLECHAR="kbdZO0QLCJUYX/|()1{}[]?-_";
-    public static int width = 600, height = 1024; // 大小自己可设置
+    public static final int width = 600, height = 1024; // 大小自己可设置
+    @Value("${upload.file.path}")
+	private String filePath;
 
-	private static String FILE_PATH;
-
-	static {
+	/*static {
 		try {
 			FILE_PATH = ResourceUtils.getURL("classpath:").getPath();
 			System.out.println(FILE_PATH);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 
-//    @Value("${upload.file.path}")
-//    private String filePath;
-//
     @Value("${error.file.path}")
     private String errPath;
 
@@ -52,7 +49,7 @@ public class Img2TxtService {
 //    }
 
     public File save(byte[] bytes,String name,String type) throws IOException {
-        File newFile = new File(FILE_PATH + File.separator + name);
+        File newFile = new File(filePath + name);
         if(!newFile.exists()){
             newFile.createNewFile();
         }
@@ -150,7 +147,6 @@ public class Img2TxtService {
                 int g = (rgb & 0xff00) >> 8;
                 int b = rgb & 0xff;
                 int gray = (int) (0.2126 * r + 0.7152 * g + 0.0722 * b);
-
                 // 把int gray转换成char
                 int len = toChar.length();
                 int base = 256 / len + 1;
@@ -192,10 +188,7 @@ public class Img2TxtService {
                     r=getDarkColor(red,green,blue,-50);
                     dImg.setRGB(y,x, r);
                 }else {
-                     /*r=(0XFFFFFF - r);
-                     red = (r >> 16) & 0x0ff;
-                     green = (r >> 8) & 0x0ff;
-                     blue = r & 0x0ff;*/
+                     //r=(0XFFFFFF - r);
                     r=getDarkColor(red,green,blue,50);
                     dImg.setRGB(y,x, r);
                 }
@@ -243,7 +236,6 @@ public class Img2TxtService {
         int width2 = img.getWidth();
         int height2 = img.getHeight();
         BufferedImage image = new BufferedImage(width2, height2, BufferedImage.TYPE_3BYTE_BGR);
-        //BufferedImage image = img;
         // 获取图形上下文对象
         Graphics g = image.getGraphics();
         Graphics2D graphics = (Graphics2D) g;
