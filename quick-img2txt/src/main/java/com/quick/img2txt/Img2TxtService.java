@@ -90,8 +90,23 @@ public class Img2TxtService {
         BufferedImage sImage = ImageIO.read(file);
         BufferedImage scaled = getScaledImg(sImage);
         char[][] array = getImageMatrix(scaled);
+        StringBuffer sb = new StringBuffer();
+        String[] imgStr=new String[array.length];
+        for (int i=0;i<array.length;i++) {
+            char[] cs =array[i];
+            for (char c : cs) {
+                if (PEOPLECHAR.contains(c+"")){
+                    sb.append(c);
+                }else {
+                    sb.append(" ");
+                }
+            }
+            imgStr[i]=sb.toString();
+            sb = new StringBuffer();
+        }
         BufferedImage dImage = new BufferedImage(scaled.getWidth(), scaled.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
         setImgColor(array,scaled, dImage);
+        dImage=createImage(imgStr,dImage);
         String outName = file.getAbsolutePath()+".jpg";
         File outFile = new File(outName);
         // 创建图片输出流对象，基于文件对象
@@ -235,12 +250,12 @@ public class Img2TxtService {
         // 设置背景宽高
         int width2 = img.getWidth();
         int height2 = img.getHeight();
-        BufferedImage image = new BufferedImage(width2, height2, BufferedImage.TYPE_3BYTE_BGR);
+        BufferedImage image = img;
         // 获取图形上下文对象
         Graphics g = image.getGraphics();
         Graphics2D graphics = (Graphics2D) g;
         // 填充
-        graphics.fillRect(0, 0, width2, height2);
+        //graphics.fillRect(0, 0, width2, height2);
         // 设定字体大小及样式
         graphics.setFont(new Font("宋体", Font.BOLD,1));
         // 字体颜色
@@ -250,7 +265,7 @@ public class Img2TxtService {
             graphics.drawString(strs[i], 0,   i+1 );
             graphics.drawString("", 0,   i+2 );
         }*/
-        for (int i = 0; i < strs.length; i=i+1) {
+        for (int i = 0; i < strs.length; i=i+5) {
             // 描绘字符串
             graphics.drawString(strs[i], 0,   i+1 );
         }
